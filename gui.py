@@ -75,7 +75,6 @@ def capture_hotkey():
 
     try:
         register_hotkey(key)
-        messagebox.showinfo("Sucesso", f"Hotkey configurada: {key}")
     except:
         messagebox.showerror("Erro", "Não foi possível registrar esta hotkey.")
 
