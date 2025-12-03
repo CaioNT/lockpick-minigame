@@ -6,6 +6,7 @@ from PIL import ImageGrab
 import keyboard
 import threading
 
+
 def detect_arrows_hud_realtime():
     """
     Detecta as 12 setas do HUD em tempo real capturando a tela.
@@ -86,8 +87,7 @@ def detect_arrows_hud_realtime():
         cv2.putText(debug_img, f"{i+1}:{arrow['direction']}", (x, y-5), 
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
     
-    cv2.imwrite('debug_arrows_realtime.png', debug_img)
-    print("Imagem de debug salva: debug_arrows_realtime.png")
+    #cv2.imwrite('debug_arrows_realtime.png', debug_img)
     
     return [arrow['direction'] for arrow in arrows]
 
@@ -142,7 +142,7 @@ def classify_arrow_direction(roi_mask):
 from pynput.keyboard import Controller, Key
 kb = Controller()
 
-def press_arrow_key(direction, duration=0.1):
+def press_arrow_key(direction, duration=0.01):
     direction_map = {
         'CIMA': Key.up,
         'BAIXO': Key.down,
@@ -157,7 +157,7 @@ def press_arrow_key(direction, duration=0.1):
         kb.release(key)
         print(f"Pressionou: {direction}")
 
-def execute_arrows(directions, delay=0.2):
+def execute_arrows(directions, delay=0.01):
     """
     Executa a sequência de setas pressionando as teclas.
     """
@@ -166,7 +166,7 @@ def execute_arrows(directions, delay=0.2):
     print(f"Total de setas a pressionar: {len(directions)}")
     print('='*60)
     
-    time.sleep(0.05)  # Aguarda 1 segundo antes de iniciar
+    time.sleep(0.1)  # Aguarda 1 segundo antes de iniciar
     
     for i, direction in enumerate(directions, 1):
         print(f"[{i}/{len(directions)}] Pressionando: {direction}")
@@ -189,7 +189,7 @@ if __name__ == "__main__":
     # Aguarda 3 segundos
     for i in range(3, 0, -1):
         print(f"Capturando em {i}...")
-        time.sleep(1)
+        time.sleep(0.1)
     
     print("\nCapturando...")
     directions = detect_arrows_hud_realtime()
@@ -204,13 +204,4 @@ if __name__ == "__main__":
         print(f"{' -> '.join(directions)}")
         print('='*60)
         
-        print("\nExecutando as setas automaticamente em 1 segundo...\n")
-        time.sleep(1)
-        execute_arrows(directions, delay=0.05)
-        
-        print("\n(Programa encerrará em 2 segundos...)")
-        time.sleep(2)
-    else:
-        print("\n✗ Nenhuma seta foi detectada!")
-        print("Verifique se o jogo está visível e tente novamente.")
-        time.sleep(3)
+        execute_arrows(directions, delay=0.01)
