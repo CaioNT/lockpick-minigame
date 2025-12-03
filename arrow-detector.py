@@ -1,7 +1,7 @@
+import time
 import cv2
 import numpy as np
 import pyautogui
-import time
 from PIL import ImageGrab
 import keyboard
 import threading
@@ -12,7 +12,7 @@ def detect_arrows_hud_realtime():
     """
     
     print("Capturando screenshot da tela...")
-    time.sleep(1)
+    time.sleep(0.1)
     
     # Captura a tela
     screenshot = ImageGrab.grab()
@@ -139,23 +139,23 @@ def classify_arrow_direction(roi_mask):
         else:
             return 'DIREITA'
 
+from pynput.keyboard import Controller, Key
+kb = Controller()
+
 def press_arrow_key(direction, duration=0.1):
-    """
-    Pressiona a tecla de seta correspondente à direção.
-    """
     direction_map = {
-        'CIMA': 'up',
-        'BAIXO': 'down',
-        'ESQUERDA': 'left',
-        'DIREITA': 'right'
+        'CIMA': Key.up,
+        'BAIXO': Key.down,
+        'ESQUERDA': Key.left,
+        'DIREITA': Key.right
     }
     
     key = direction_map.get(direction)
     if key:
-        keyboard.press(key)
+        kb.press(key)
         time.sleep(duration)
-        keyboard.release(key)
-        print(f"Pressionou: {direction} ({key})")
+        kb.release(key)
+        print(f"Pressionou: {direction}")
 
 def execute_arrows(directions, delay=0.2):
     """
@@ -166,7 +166,7 @@ def execute_arrows(directions, delay=0.2):
     print(f"Total de setas a pressionar: {len(directions)}")
     print('='*60)
     
-    time.sleep(1)  # Aguarda 1 segundo antes de iniciar
+    time.sleep(0.05)  # Aguarda 1 segundo antes de iniciar
     
     for i, direction in enumerate(directions, 1):
         print(f"[{i}/{len(directions)}] Pressionando: {direction}")
@@ -204,9 +204,9 @@ if __name__ == "__main__":
         print(f"{' -> '.join(directions)}")
         print('='*60)
         
-        # Executa as setas
-        input("\nPressione ENTER para executar a sequência...")
-        execute_arrows(directions, delay=0.15)
+        print("\nExecutando as setas automaticamente em 1 segundo...\n")
+        time.sleep(1)
+        execute_arrows(directions, delay=0.05)
         
         print("\n(Programa encerrará em 2 segundos...)")
         time.sleep(2)
