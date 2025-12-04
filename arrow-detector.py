@@ -5,6 +5,7 @@ from PIL import ImageGrab
 from pynput.keyboard import Controller, Key
 import traceback
 from datetime import datetime
+import os
 
 LOG_FILE = "arrow-log.txt"
 
@@ -152,8 +153,6 @@ if __name__ == "__main__":
     finally:
         # Abre o log sempre ao final
         try:
-            import os
             os.startfile(LOG_FILE)
         except:
             pass
-
