@@ -6,9 +6,24 @@ from pynput.keyboard import Controller, Key
 import traceback
 from datetime import datetime
 import os
+import sys
 
-LOG_FILE = "arrow-log.txt"
 
+# ====== FUNÇÃO PARA OBTER O CAMINHO CERTO DO LOG ======
+def get_exe_path():
+    """Retorna o caminho da pasta onde o script ou EXE está."""
+    if hasattr(sys, "_MEIPASS"):
+        # rodando como .exe
+        return os.path.dirname(sys.executable)
+    else:
+        # rodando como script normal
+        return os.path.dirname(os.path.abspath(__file__))
+
+
+LOG_FILE = os.path.join(get_exe_path(), "arrow-log.txt")
+
+
+# ====== FUNÇÃO DE LOG ======
 def log(msg):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(LOG_FILE, "a", encoding="utf-8") as f:
