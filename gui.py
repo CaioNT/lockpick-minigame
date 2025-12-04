@@ -31,26 +31,11 @@ RECORDING = False
 def run_script():
     def task():
         try:
-            # Executável dentro do PyInstaller
-            exe_path = resource_path("arrow-detector.exe")
-            py_path = resource_path("arrow-detector.py")
-
-            if os.path.exists(exe_path):
-                detector_exe = resource_path("arrow-detector.exe")
-                subprocess.Popen(
-                    [detector_exe],
-                    creationflags=subprocess.CREATE_NO_WINDOW
-                )
-
-            elif os.path.exists(py_path):
-                subprocess.Popen(
-                    [sys.executable, py_path],
-                    creationflags=subprocess.CREATE_NO_WINDOW
-                )
-
-            else:
-                messagebox.showerror("Erro", "arrow-detector não encontrado!")
-
+            script_path = resource_path("arrow-detector.py")
+            subprocess.Popen(
+                ["python", script_path],
+                creationflags=subprocess.CREATE_NO_WINDOW
+            )
         except Exception as e:
             messagebox.showerror("Erro", f"Ocorreu um erro:\n{e}")
 

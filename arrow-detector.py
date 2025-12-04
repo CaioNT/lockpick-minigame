@@ -6,19 +6,8 @@ from pynput.keyboard import Controller, Key
 import traceback
 from datetime import datetime
 import os
-import sys
 
-
-def get_exe_path():
-    """Retorna o caminho correto dentro do .exe"""
-    if hasattr(sys, "_MEIPASS"):
-        return os.path.dirname(sys.executable)
-    else:
-        return os.path.dirname(os.path.abspath(__file__))
-
-
-LOG_FILE = os.path.join(get_exe_path(), "arrow-log.txt")
-
+LOG_FILE = "arrow-log.txt"
 
 def log(msg):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -26,6 +15,7 @@ def log(msg):
         f.write(f"[{timestamp}] {msg}\n")
 
 
+# CLASSIFICA A DIREÇÃO
 def classify_arrow_direction(roi_mask):
     try:
         h, w = roi_mask.shape
@@ -66,6 +56,7 @@ def classify_arrow_direction(roi_mask):
         return None
 
 
+# DETECÇÃO DAS SETAS
 def detect_arrows_hud_realtime():
     try:
         log("Capturando screenshot...")
@@ -115,11 +106,12 @@ def detect_arrows_hud_realtime():
         log(f"Setas detectadas: {[a['direction'] for a in arrows]}")
         return [arrow['direction'] for arrow in arrows]
 
-    except Exception as e:
+    except Exception:
         log("Erro em detect_arrows_hud_realtime:\n" + traceback.format_exc())
         return []
 
 
+# INPUT DAS SETAS
 kb = Controller()
 
 def press_arrow_key(direction, duration=0.03):
@@ -146,6 +138,7 @@ def execute_arrows(directions, delay=0.01):
         time.sleep(delay)
 
 
+# MAIN
 if __name__ == "__main__":
     try:
         log("===== EXECUÇÃO DO SCRIPT =====")
@@ -158,7 +151,9 @@ if __name__ == "__main__":
     except:
         log("Erro no main:\n" + traceback.format_exc())
     finally:
+        # Abre o log sempre ao final
         try:
+            import os
             os.startfile(LOG_FILE)
         except:
             pass

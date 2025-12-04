@@ -1,0 +1,23 @@
+[2025-12-03 23:29:01] ===== EXECUÇÃO DO SCRIPT =====
+[2025-12-03 23:29:01] Capturando screenshot...
+[2025-12-03 23:29:01] Screenshot capturado - resolução: 1920x1080
+[2025-12-03 23:29:01] 140 contornos encontrados.
+[2025-12-03 23:29:01] Setas detectadas: []
+[2025-12-03 23:29:01] Nenhuma seta detectada.
+[2025-12-03 23:29:44] ===== EXECUÇÃO DO SCRIPT =====
+[2025-12-03 23:29:44] Capturando screenshot...
+[2025-12-03 23:29:44] Screenshot capturado - resolução: 1920x1080
+[2025-12-03 23:29:44] 61 contornos encontrados.
+[2025-12-03 23:29:44] Setas detectadas: ['DIREITA', 'BAIXO', 'BAIXO', 'CIMA', 'CIMA', 'DIREITA', 'BAIXO', 'CIMA', 'ESQUERDA', 'CIMA', 'CIMA', 'ESQUERDA']
+[2025-12-03 23:29:44] Pressionada tecla: DIREITA
+[2025-12-03 23:29:44] Pressionada tecla: BAIXO
+[2025-12-03 23:29:44] Pressionada tecla: BAIXO
+[2025-12-03 23:29:44] Pressionada tecla: CIMA
+[2025-12-03 23:29:45] Pressionada tecla: CIMA
+[2025-12-03 23:29:45] Pressionada tecla: DIREITA
+[2025-12-03 23:29:45] Pressionada tecla: BAIXO
+[2025-12-03 23:29:45] Pressionada tecla: CIMA
+[2025-12-03 23:29:45] Pressionada tecla: ESQUERDA
+[2025-12-03 23:29:45] Pressionada tecla: CIMA
+[2025-12-03 23:29:45] Pressionada tecla: CIMA
+[2025-12-03 23:29:45] Pressionada tecla: ESQUERDA
