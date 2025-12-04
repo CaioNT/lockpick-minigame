@@ -7,18 +7,45 @@ import pystray
 from PIL import Image, ImageDraw
 import sys
 import os
+import traceback
 
 # ==========================
 # Helpers
 # ==========================
 
 def resource_path(relative_path):
+    # Procura primeiro no diretório do executável
+    exe_dir = os.path.dirname(sys.executable)
+    exe_path = os.path.join(exe_dir, relative_path)
+    
+    if os.path.exists(exe_path):
+        return exe_path
+    
+    # Se não encontrar, tenta no diretório atual
+    current_path = os.path.join(os.path.abspath("."), relative_path)
+    if os.path.exists(current_path):
+        return current_path
+    
+    # Fallback para o diretório do PyInstaller
     try:
         base_path = sys._MEIPASS
     except Exception:
         base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
+
+
+# ==========================
+# Debug / Logging
+# ==========================
+
+def log_debug(msg):
+    """Salva logs para debug"""
+    try:
+        with open("lockpick-debug.log", "a", encoding="utf-8") as f:
+            f.write(f"{msg}\n")
+    except:
+        pass
 
 
 # ==========================
@@ -31,13 +58,50 @@ RECORDING = False
 def run_script():
     def task():
         try:
-            script_path = resource_path("arrow-detector.py")
-            subprocess.Popen(
-                ["python", script_path],
-                creationflags=subprocess.CREATE_NO_WINDOW
-            )
+            log_debug("=== Iniciando run_script ===")
+            
+            # Tenta usar o .exe primeiro
+            exe_path = resource_path("arrow-detector.exe")
+            py_path = resource_path("arrow-detector.py")
+
+            log_debug(f"Procurando .exe em: {exe_path}")
+            log_debug(f"Procurando .py em: {py_path}")
+            log_debug(f"Diretório atual: {os.getcwd()}")
+            log_debug(f"Arquivos no diretório: {os.listdir('.')}")
+
+            if os.path.exists(exe_path):
+                log_debug(f"Encontrado .exe, executando: {exe_path}")
+                result = subprocess.Popen(
+                    [exe_path],
+                    creationflags=subprocess.CREATE_NO_WINDOW,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
+                log_debug(f"Processo iniciado com PID: {result.pid}")
+                
+            elif os.path.exists(py_path):
+                log_debug(f"Encontrado .py, executando com python: {py_path}")
+                result = subprocess.Popen(
+                    [sys.executable, py_path],
+                    creationflags=subprocess.CREATE_NO_WINDOW,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
+                log_debug(f"Processo iniciado com PID: {result.pid}")
+                
+            else:
+                log_debug("ERRO: Nenhum arquivo encontrado!")
+                messagebox.showerror("Erro", 
+                    f"arrow-detector não encontrado!\n\n"
+                    f"Procurado em:\n"
+                    f"{exe_path}\n{py_path}\n\n"
+                    f"Arquivos disponíveis:\n"
+                    f"{os.listdir('.')}")
+
         except Exception as e:
-            messagebox.showerror("Erro", f"Ocorreu um erro:\n{e}")
+            error_msg = traceback.format_exc()
+            log_debug(f"ERRO: {error_msg}")
+            messagebox.showerror("Erro", f"Ocorreu um erro:\n{e}\n\nVerifique lockpick-debug.log")
 
     threading.Thread(target=task, daemon=True).start()
 
@@ -55,7 +119,12 @@ def register_hotkey(bind):
         except:
             pass
 
-    CURRENT_BIND = keyboard.add_hotkey(bind, run_script)
+    try:
+        CURRENT_BIND = keyboard.add_hotkey(bind, run_script)
+        log_debug(f"Hotkey registrada: {bind}")
+    except Exception as e:
+        log_debug(f"Erro ao registrar hotkey: {e}")
+        raise
 
 
 def start_record_hotkey():
@@ -67,14 +136,14 @@ def start_record_hotkey():
 
 def capture_hotkey():
     global RECORDING
-    key = keyboard.read_hotkey(suppress=False)
-
-    RECORDING = False
-    hotkey_value_label.config(text=key)
-
     try:
+        key = keyboard.read_hotkey(suppress=False)
+        RECORDING = False
+        hotkey_value_label.config(text=key)
         register_hotkey(key)
-    except:
+    except Exception as e:
+        RECORDING = False
+        log_debug(f"Erro ao capturar hotkey: {e}")
         messagebox.showerror("Erro", "Não foi possível registrar esta hotkey.")
 
 
@@ -147,11 +216,19 @@ btn_run = tk.Button(root, text="Run",
                     width=20)
 btn_run.pack(pady=10)
 
+btn_debug = tk.Button(root, text="Ver Debug Log",
+                      command=lambda: os.startfile("lockpick-debug.log") if os.path.exists("lockpick-debug.log") else messagebox.showinfo("Info", "Nenhum log encontrado ainda."),
+                      font=("Segoe UI", 10),
+                      bg="#555", fg="white")
+btn_debug.pack(pady=5)
+
 btn_hide = tk.Button(root, text="Minimizar P/ Bandeja",
                      command=hide_window,
                      font=("Segoe UI", 10),
                      bg="#333", fg="white")
 btn_hide.pack(pady=5)
+
+log_debug("=== APLICAÇÃO INICIADA ===")
 
 icon = create_tray_icon()
 threading.Thread(target=lambda: icon.run(), daemon=True).start()

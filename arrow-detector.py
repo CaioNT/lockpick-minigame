@@ -150,10 +150,3 @@ if __name__ == "__main__":
             log("Nenhuma seta detectada.")
     except:
         log("Erro no main:\n" + traceback.format_exc())
-    finally:
-        # Abre o log sempre ao final
-        try:
-            import os
-            os.startfile(LOG_FILE)
-        except:
-            pass
