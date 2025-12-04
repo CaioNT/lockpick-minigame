@@ -9,28 +9,23 @@ import os
 import sys
 
 
-# ====== FUNÇÃO PARA OBTER O CAMINHO CERTO DO LOG ======
 def get_exe_path():
-    """Retorna o caminho da pasta onde o script ou EXE está."""
+    """Retorna o caminho correto dentro do .exe"""
     if hasattr(sys, "_MEIPASS"):
-        # rodando como .exe
         return os.path.dirname(sys.executable)
     else:
-        # rodando como script normal
         return os.path.dirname(os.path.abspath(__file__))
 
 
 LOG_FILE = os.path.join(get_exe_path(), "arrow-log.txt")
 
 
-# ====== FUNÇÃO DE LOG ======
 def log(msg):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(LOG_FILE, "a", encoding="utf-8") as f:
         f.write(f"[{timestamp}] {msg}\n")
 
 
-# CLASSIFICA A DIREÇÃO
 def classify_arrow_direction(roi_mask):
     try:
         h, w = roi_mask.shape
@@ -71,7 +66,6 @@ def classify_arrow_direction(roi_mask):
         return None
 
 
-# DETECÇÃO DAS SETAS
 def detect_arrows_hud_realtime():
     try:
         log("Capturando screenshot...")
@@ -126,7 +120,6 @@ def detect_arrows_hud_realtime():
         return []
 
 
-# INPUT DAS SETAS
 kb = Controller()
 
 def press_arrow_key(direction, duration=0.03):
@@ -153,7 +146,6 @@ def execute_arrows(directions, delay=0.01):
         time.sleep(delay)
 
 
-# MAIN
 if __name__ == "__main__":
     try:
         log("===== EXECUÇÃO DO SCRIPT =====")
@@ -166,7 +158,6 @@ if __name__ == "__main__":
     except:
         log("Erro no main:\n" + traceback.format_exc())
     finally:
-        # Abre o log sempre ao final
         try:
             os.startfile(LOG_FILE)
         except:

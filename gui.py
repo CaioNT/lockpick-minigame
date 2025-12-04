@@ -12,13 +12,14 @@ import os
 # Helpers
 # ==========================
 
-def resource_path(relative):
-    """Permite achar arquivos ao virar EXE com PyInstaller"""
+def resource_path(relative_path):
     try:
-        base = sys._MEIPASS
+        base_path = sys._MEIPASS
     except Exception:
-        base = os.path.abspath(".")
-    return os.path.join(base, relative)
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 # ==========================
 # Script executor
@@ -30,11 +31,26 @@ RECORDING = False
 def run_script():
     def task():
         try:
-            script_path = resource_path("arrow-detector.py")
-            subprocess.Popen(
-                ["python", script_path],
-                creationflags=subprocess.CREATE_NO_WINDOW
-            )
+            # Executável dentro do PyInstaller
+            exe_path = resource_path("arrow-detector.exe")
+            py_path = resource_path("arrow-detector.py")
+
+            if os.path.exists(exe_path):
+                detector_exe = resource_path("arrow-detector.exe")
+                subprocess.Popen(
+                    [detector_exe],
+                    creationflags=subprocess.CREATE_NO_WINDOW
+                )
+
+            elif os.path.exists(py_path):
+                subprocess.Popen(
+                    [sys.executable, py_path],
+                    creationflags=subprocess.CREATE_NO_WINDOW
+                )
+
+            else:
+                messagebox.showerror("Erro", "arrow-detector não encontrado!")
+
         except Exception as e:
             messagebox.showerror("Erro", f"Ocorreu um erro:\n{e}")
 
@@ -60,9 +76,7 @@ def register_hotkey(bind):
 def start_record_hotkey():
     global RECORDING
     RECORDING = True
-
     hotkey_value_label.config(text="Aguardando tecla...")
-
     threading.Thread(target=capture_hotkey, daemon=True).start()
 
 
@@ -122,12 +136,10 @@ root.configure(bg="#1e1e1e")
 def style(widget, fg="white", bg="#1e1e1e"):
     widget.configure(fg=fg, bg=bg)
 
-# Title
 label = tk.Label(root, text="Arrow Detector", font=("Segoe UI", 18, "bold"))
 style(label)
 label.pack(pady=10)
 
-# Hotkey section
 hotkey_title = tk.Label(root, text="Hotkey atual:", font=("Segoe UI", 12))
 style(hotkey_title)
 hotkey_title.pack(pady=5)
@@ -136,7 +148,6 @@ hotkey_value_label = tk.Label(root, text="Nenhuma", font=("Segoe UI", 14, "bold"
 style(hotkey_value_label)
 hotkey_value_label.pack(pady=3)
 
-# Button: record hotkey
 btn_record = tk.Button(root, text="Gravar Nova Hotkey",
                        command=start_record_hotkey,
                        font=("Segoe UI", 12),
@@ -144,7 +155,6 @@ btn_record = tk.Button(root, text="Gravar Nova Hotkey",
                        width=20)
 btn_record.pack(pady=10)
 
-# Run button
 btn_run = tk.Button(root, text="Run",
                     command=run_script,
                     font=("Segoe UI", 14, "bold"),
@@ -152,14 +162,12 @@ btn_run = tk.Button(root, text="Run",
                     width=20)
 btn_run.pack(pady=10)
 
-# Hide to tray
 btn_hide = tk.Button(root, text="Minimizar P/ Bandeja",
                      command=hide_window,
                      font=("Segoe UI", 10),
                      bg="#333", fg="white")
 btn_hide.pack(pady=5)
 
-# Tray icon thread
 icon = create_tray_icon()
 threading.Thread(target=lambda: icon.run(), daemon=True).start()
 
