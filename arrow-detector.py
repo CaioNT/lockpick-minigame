@@ -52,20 +52,16 @@ def classify_arrow_direction(roi_mask):
         else:
             return 'ESQUERDA' if left_pct > right_pct else 'DIREITA'
     except:
-        log("Erro em classify_arrow_direction:\n" + traceback.format_exc())
         return None
 
 
 # DETECÇÃO DAS SETAS
 def detect_arrows_hud_realtime():
     try:
-        log("Capturando screenshot...")
         screenshot = ImageGrab.grab()
-        img = np.array(screenshot)
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        img = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
 
         height, width = img.shape[:2]
-        log(f"Screenshot capturado - resolução: {width}x{height}")
 
         lower_white = np.array([220, 220, 220])
         upper_white = np.array([255, 255, 255])
@@ -76,7 +72,6 @@ def detect_arrows_hud_realtime():
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=1)
 
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        log(f"{len(contours)} contornos encontrados.")
 
         arrows = []
 
@@ -114,7 +109,7 @@ def detect_arrows_hud_realtime():
 # INPUT DAS SETAS
 kb = Controller()
 
-def press_arrow_key(direction, duration=0.03):
+def press_arrow_key(direction, duration=0.005):
     try:
         direction_map = {
             'CIMA': Key.up,
@@ -127,12 +122,11 @@ def press_arrow_key(direction, duration=0.03):
             kb.press(key)
             time.sleep(duration)
             kb.release(key)
-            log(f"Pressionada tecla: {direction}")
     except:
         log("Erro ao pressionar tecla:\n" + traceback.format_exc())
 
 
-def execute_arrows(directions, delay=0.01):
+def execute_arrows(directions, delay=0.002):
     for direction in directions:
         press_arrow_key(direction)
         time.sleep(delay)
@@ -142,7 +136,6 @@ def execute_arrows(directions, delay=0.01):
 if __name__ == "__main__":
     try:
         log("===== EXECUÇÃO DO SCRIPT =====")
-        time.sleep(0.1)
         directions = detect_arrows_hud_realtime()
         if directions:
             execute_arrows(directions)
