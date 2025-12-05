@@ -55,13 +55,25 @@ def classify_arrow_direction(roi_mask):
         return None
 
 
-# DETECÇÃO DAS SETAS
+# DETECÇÃO DAS SETAS - ADAPTATIVA PARA MÚLTIPLAS RESOLUÇÕES
 def detect_arrows_hud_realtime():
     try:
         screenshot = ImageGrab.grab()
         img = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
 
         height, width = img.shape[:2]
+        
+        log(f"Resolução detectada: {width}x{height}")
+        
+        # Adapta zona HUD baseado na resolução
+        # Em 1920x1080, y está entre 920-950 (86-88% da altura)
+        hud_start_pct = 0.855
+        hud_end_pct = 0.880
+        
+        y_start = int(height * hud_start_pct)
+        y_end = int(height * hud_end_pct)
+        
+        log(f"Zona HUD: y={y_start} até {y_end}")
 
         lower_white = np.array([220, 220, 220])
         upper_white = np.array([255, 255, 255])
@@ -74,17 +86,28 @@ def detect_arrows_hud_realtime():
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         arrows = []
+        
+        # Adapta limites de área baseado na resolução
+        # Em 1920x1080: área entre 80-140
+        resolution_factor = (width * height) / (1920 * 1080)
+        area_min = int(80 * resolution_factor)
+        area_max = int(140 * resolution_factor)
+        
+        log(f"Limites de área: {area_min}-{area_max}")
 
         for contour in contours:
             area = cv2.contourArea(contour)
             x, y, w, h = cv2.boundingRect(contour)
 
-            if area < 80 or area > 140:
+            # Verifica se está na zona HUD
+            if y < y_start or y > y_end:
                 continue
+                
+            if area < area_min or area > area_max:
+                continue
+                
             ratio = w / h if h > 0 else 0
             if ratio < 0.4 or ratio > 2.5:
-                continue
-            if y < 920 or y > 950:
                 continue
 
             roi_mask = mask[y:y+h, x:x+w]
