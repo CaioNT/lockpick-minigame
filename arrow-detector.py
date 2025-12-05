@@ -132,7 +132,7 @@ def detect_arrows_hud_realtime():
 # INPUT DAS SETAS
 kb = Controller()
 
-def press_arrow_key(direction, duration=0.005):
+def press_arrow_key(direction, duration=0.01):
     try:
         direction_map = {
             'CIMA': Key.up,
@@ -149,7 +149,7 @@ def press_arrow_key(direction, duration=0.005):
         log("Erro ao pressionar tecla:\n" + traceback.format_exc())
 
 
-def execute_arrows(directions, delay=0.002):
+def execute_arrows(directions, delay=0.01):
     for direction in directions:
         press_arrow_key(direction)
         time.sleep(delay)
